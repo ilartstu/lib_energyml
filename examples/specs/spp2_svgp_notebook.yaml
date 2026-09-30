@@ -1,0 +1,29 @@
+# SPP_2 with exactly the cleaning of the SVGP notebook (STEP 3).
+# In SPP_2 an exact 0 means a failure (night values are small non-zero numbers), so zeros are missing
+# in every column. Do not copy this rule to stations where nights are recorded as exact zeros.
+name: SPP_2
+time:
+  column: TIMESTAMP
+  format: "%d.%m.%y %H:%M"
+  freq: 1h
+columns:
+  POWER:          {role: target, unit: MW, limits: [-50, null]}
+  T_AIR:          {role: feature, unit: °C, limits: [-50, 60]}
+  V:              {role: feature, unit: m/s, limits: [-50, null]}
+  DIRECTION:      {role: feature, unit: deg, cyclic: 360}
+  INSOLATION_HOR: {role: feature, unit: W/m2, limits: [-50, null]}
+  T_PANELS:       {role: feature, available: history, unit: °C, limits: [-50, 100]}  # sensor, not forecastable
+  INSOLATION:     {role: feature, unit: W/m2, limits: [-50, null]}
+cleaning:
+  time: {duplicates: keep}
+  missing:
+    defaults:
+      zeros: true
+      runs: {keep: [1, 3], interpolate: [4, 24], drop_rows: [25, null]}
+  outliers:
+    detectors:
+      zscore: {threshold: 5.0}
+      iqr: {factor: 4.0}
+      hampel: {window: 72, n_sigmas: 12.0}
+    apply: [zscore]
+    action: interpolate

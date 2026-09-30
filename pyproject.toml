@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "energyprime"
+version = "0.1.0"
+description = "Solar and wind power forecasting from weather data: loading, cleaning, features, models, evaluation."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "matplotlib>=3.7",
+    "pyyaml>=6.0",
+    "openpyxl>=3.1",
+]
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+authors = [{ name = "Ilia Stulov, Andrew Kulinskii, Sergei Strijhak" }]        # email по желанию: на PyPI его увидят все
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+]
+
+[project.urls]
+Repository = "https://github.com/ilartstu/lib_energyml"
+
+[project.optional-dependencies]
+xgboost = ["xgboost>=2.0"]
+lstm = ["keras>=3.0", "tensorflow>=2.16"]
+gp = ["torch>=2.1", "gpytorch>=1.11"]
+sklearn = ["scikit-learn>=1.3"]
+all = [
+    "xgboost>=2.0",
+    "keras>=3.0",
+    "tensorflow>=2.16",
+    "torch>=2.1",
+    "gpytorch>=1.11",
+    "scikit-learn>=1.3",
+]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: trains real models (deselect with -m 'not slow')",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

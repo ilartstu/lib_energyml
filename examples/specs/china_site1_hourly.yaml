@@ -1,0 +1,33 @@
+# Solar station site 1 (public Chinese dataset), hourly, prepared file solar_dataset_full_1.csv.
+# YEAR, MONTH, DAY, HOUR and the ready-made *_SIN/*_COS columns are not listed, so they are ignored:
+# the recipes rebuild calendar features from the timestamps (same values).
+name: china_site1_hourly
+capacity: 50            # MW, nominal capacity; metrics are normalised by it
+time:
+  column: Datetime
+  freq: 1h
+columns:
+  POWER: {role: target, unit: MW, limits: [-1, 55]}
+  TSI:   {role: feature, unit: W/m2, label: Total solar irradiance, limits: [0, 1500]}
+  DNI:   {role: feature, unit: W/m2, label: Direct normal irradiance, limits: [0, 1200]}
+  GHI:   {role: feature, unit: W/m2, label: Global horizontal irradiance, limits: [0, 1500]}
+  AIR_T: {role: feature, unit: °C, limits: [-50, 60]}
+  AIR_P: {role: feature, unit: hPa, limits: [500, 1100]}
+  RH:    {role: feature, unit: "%", limits: [0, 100]}
+cleaning:
+  time: {duplicates: mean}
+  missing:
+    defaults:
+      nan: true
+      zeros: false          # night zeros of power and irradiance are real values
+      runs: {interpolate: [1, 6], drop_rows: [7, null]}
+    columns:
+      AIR_P: {zeros: true}  # pressure is never 0: a zero is a logger failure
+      RH:    {zeros: true}
+  outliers:
+    detectors:
+      zscore: {threshold: 5.0}
+      iqr: {factor: 4.0}
+      hampel: {window: 72, n_sigmas: 12.0}
+    apply: [zscore]         # iqr and hampel only appear in the diagnostics
+    action: interpolate

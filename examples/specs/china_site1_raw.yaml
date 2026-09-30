@@ -1,0 +1,38 @@
+# Solar station site 1, raw 15-minute Excel file "Solar station site 1 (Nominal capacity-50MW).xlsx".
+# Long column names are renamed to short ones while loading.
+name: china_site1_raw
+capacity: 50
+time:
+  column: "Time(year-month-day h:m:s)"
+  freq: 15min
+read:
+  rename:
+    "Total solar irradiance (W/m2)": TSI
+    "Direct normal irradiance (W/m2)": DNI
+    "Global horizontal irradiance (W/m2)": GHI
+    "Air temperature  (°C)": AIR_T
+    "Atmosphere (hpa)": AIR_P
+    "Relative humidity (%)": RH
+    "Power (MW)": POWER
+columns:
+  POWER: {role: target, unit: MW, limits: [-1, 55]}
+  TSI:   {role: feature, unit: W/m2, limits: [0, 1500]}
+  DNI:   {role: feature, unit: W/m2, limits: [0, 1200]}
+  GHI:   {role: feature, unit: W/m2, limits: [0, 1500]}
+  AIR_T: {role: feature, unit: °C, limits: [-50, 60]}
+  AIR_P: {role: feature, unit: hPa, limits: [500, 1100]}
+  RH:    {role: feature, unit: "%", limits: [0, 100]}
+cleaning:
+  time: {duplicates: mean}
+  missing:
+    defaults:
+      nan: true
+      zeros: false                                  # nights are real zeros here
+      runs: {interpolate: [1, 24], drop_rows: [25, null]}   # 24 x 15 min = 6 hours
+    columns:
+      AIR_P: {zeros: true}
+      RH:    {zeros: true}
+  outliers:
+    detectors: {zscore: {threshold: 5.0}, hampel: {window: 288, n_sigmas: 12.0}}
+    apply: [zscore]
+    action: interpolate
