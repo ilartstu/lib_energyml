@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Данные и результаты — только в корне репозитория
+/data/
+/runs/
+/models/
+/figures/
+/daily_forecasts/
+*.csv
+*.xlsx
+*.parquet
+*.pkl
+*.pth
+*.keras
+!tests/data/*.csv
+
+# macOS и редакторы
+.DS_Store
+.idea/
+.vscode/
